@@ -1,0 +1,39 @@
+# Ignore Python bytecode
+__pycache__/
+*.pyc
+
+# Ignore node modules
+node_modules/
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore backup files
+*.bak
+*dump
+# *.sql
+
+# Ignore environment files
+.env
+
+# Ignore log files
+*.log
+
+# Ignore IDE/editor folders
+.vscode/
+.idea/
+
+# Ignore Redis data
+# redis/
+
+# Ignore MySQL data
+# mysql/
+
+# Ignore PostgreSQL data
+*/postgresql/volumes/postgresql/backup
+*/postgresql/volumes/postgresql/data
+*/postgresql/volumes/pgadmin
+
+# Ignore other common files
+*.swp
+*.swo
