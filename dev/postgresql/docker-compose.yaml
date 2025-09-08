@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    volumes:
+      - ./volumes/postgresql/backup:/var/lib/postgresql/backup
+      - ./volumes/postgresql/config/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./volumes/postgresql/config/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./volumes/postgresql/data:/var/lib/postgresql/data
+      - ./volumes/postgresql/pgsql:/etc/pgsql
+      - ./volumes/postgresql/pgsql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_DB: test_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+    - 8080:80
+    volumes:
+    - ./volumes/pgadmin:/var/lib/pgadmin
+    depends_on:
+    - postgres
+  backup:
+    image: postgres:16-alpine
+    container_name: postgres-backup
+    volumes:
+    - ./volumes/postgresql/backup:/var/lib/postgresql/backup
+    - ./volumes/postgresql/data:/var/lib/postgresql/data
+    entrypoint: bash
+    command: >
+      -c "pg_dump -h postgres -U user -F c test_db > /var/lib/postgresql/backup/backup_$(date +%Y%m%d%H%M%S).dump"
+    environment:
+      PGPASSWORD: pass
+    depends_on:
+    - postgres
