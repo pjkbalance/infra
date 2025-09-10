@@ -27,11 +27,15 @@ node_modules/
 # redis/
 
 # Ignore MySQL data
-# mysql/
+*/mysql/volumes/mysql/backup
+*/mysql/volumes/mysql/data
+*/mysql/volumes/mysql/logs
+*/mysql/volumes/phpmyadmin
 
 # Ignore PostgreSQL data
 */postgresql/volumes/postgresql/backup
 */postgresql/volumes/postgresql/data
+*/postgresql/volumes/postgresql/logs
 */postgresql/volumes/pgadmin
 
 # Ignore other common files
