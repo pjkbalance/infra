@@ -24,7 +24,9 @@ node_modules/
 .idea/
 
 # Ignore Redis data
-# redis/
+redis/volumes/redis/data
+redis/volumes/redis/logs
+redis/volumes/redisinsight
 
 # Ignore MySQL data
 */mysql/volumes/mysql/backup

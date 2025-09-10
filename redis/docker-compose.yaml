@@ -1,0 +1,29 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis-db
+    restart: unless-stopped
+    ports:
+      - ${EXPORT_PORT_REDIS:-6379}:6379
+    env_file:
+      - .env
+    volumes:
+      - ./volumes/redis/data:/data
+      - ./volumes/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - ./volumes/redis/logs:/usr/local/var/log/redis
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    restart: unless-stopped
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    environment:
+      RI_DATA_DIR: /db
+    ports:
+      - ${EXPORT_PORT_REDISINSIGHT:-5540}:5540
+    volumes:
+      - ./volumes/redisinsight:/db
