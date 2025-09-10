@@ -1,0 +1,51 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${DB_DATABASE:-db}
+      MYSQL_USER: ${DB_USERNAME:-user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "${EXPORT_PORT_MYSQL:-3306}:3306"
+    volumes:
+      - ./volumes/mysql/config/my.cnf:/etc/mysql/my.cnf:ro
+      - ./volumes/mysql/config/conf.d:/etc/mysql/conf.d:ro
+      - ./volumes/mysql/data:/var/lib/mysql
+      - ./volumes/mysql/logs:/var/log/mysql
+      - ./volumes/mysql/sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  backup:
+    image: mysql:8.0
+    container_name: mysql-backup
+    depends_on:
+      - mysql
+    entrypoint: bash
+    command: >
+      -c "mysqldump -h mysql -u ${DB_USERNAME} -p${DB_PASSWORD} ${DB_DATABASE} > /backup/backup_$(date +%Y%m%d_%H%M%S).sql"
+    volumes:
+      - ./volumes/mysql/backup:/backup
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    platform: linux/amd64
+    container_name: php-my-admin
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PMA_HOST: ${DB_HOST:-mysql}
+      PMA_PORT: ${EXPORT_PORT_MYSQL:-3306}
+      PMA_USER: ${DB_USERNAME:-user}
+      PMA_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "${EXPORT_PORT_PHPMYADMIN:-8080}:80"
+    depends_on:
+      - mysql
+    volumes:
+      - ./volumes/phpmyadmin/sessions:/sessions
+      - ./volumes/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro

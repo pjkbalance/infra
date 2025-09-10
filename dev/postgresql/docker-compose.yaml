@@ -1,45 +1,54 @@
+version: '3.8'
+
 services:
   postgres:
     image: postgres:16-alpine
     container_name: postgres-db
     restart: unless-stopped
     ports:
-      - 5432:5432
+      - ${EXPORT_PORT_POSTGRES:-5432}:5432
+    env_file:
+      - .env
+    # environment:
+    #   POSTGRES_DB: ${POSTGRES_DB:-postgres}
+    #   POSTGRES_USER: ${POSTGRES_USER:-user}
+    #   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
     volumes:
-      - ./volumes/postgresql/backup:/var/lib/postgresql/backup
-      - ./volumes/postgresql/config/postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./volumes/postgresql/config/pg_hba.conf:/etc/postgresql/pg_hba.conf
       - ./volumes/postgresql/data:/var/lib/postgresql/data
+      - ./volumes/postgresql/backup:/var/lib/postgresql/backup
+      - ./volumes/postgresql/config/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - ./volumes/postgresql/config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./volumes/postgresql/logs:/var/log/postgresql
       - ./volumes/postgresql/pgsql:/etc/pgsql
       - ./volumes/postgresql/pgsql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
+  backup:
+    image: postgres:16-alpine
+    container_name: postgres-backup
+    depends_on:
+      - postgres
     environment:
-      POSTGRES_DB: test_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+      PGPASSWORD: ${POSTGRES_PASSWORD:-password}
+    volumes:
+      - ./volumes/postgresql/backup:/var/lib/postgresql/backup
+      - ./volumes/postgresql/data:/var/lib/postgresql/data
+    entrypoint: /bin/bash
+    command: >
+      -c "pg_dump -h postgres -U ${POSTGRES_USER:-user} -F c ${POSTGRES_DB:-postgres} > /var/lib/postgresql/backup/backup_$(date +%Y%m%d%H%M%S).dump"
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
     restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    # environment:
+    #   PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
+    #   PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
     ports:
-    - 8080:80
+      - ${EXPORT_PORT_PGADMIN:-8080}:80
     volumes:
-    - ./volumes/pgadmin:/var/lib/pgadmin
-    depends_on:
-    - postgres
-  backup:
-    image: postgres:16-alpine
-    container_name: postgres-backup
-    volumes:
-    - ./volumes/postgresql/backup:/var/lib/postgresql/backup
-    - ./volumes/postgresql/data:/var/lib/postgresql/data
-    entrypoint: bash
-    command: >
-      -c "pg_dump -h postgres -U user -F c test_db > /var/lib/postgresql/backup/backup_$(date +%Y%m%d%H%M%S).dump"
-    environment:
-      PGPASSWORD: pass
-    depends_on:
-    - postgres
+      - ./volumes/pgadmin:/var/lib/pgadmin
