@@ -15,13 +15,13 @@ docker compose down -v
 ```
 
 # Mysql
-## backup
+## Backup
 Run the following script to backup DB manually
 ```sh
 docker-compose run backup
 ```
 
-## reset
+## Reset
 ```sh
 rm -rf ./volumes/phpmyadmin/sessions \
 ./volumes/mysql/backup \
@@ -29,18 +29,18 @@ rm -rf ./volumes/phpmyadmin/sessions \
 ./volumes/mysql/logs
 ```
 
-## initial SQL
-Just run once when there is no data.
-path: volumes/postgresql/pgsql
+## Initial SQL
+Just run once during initialization.(path: volumes/mysql/sql)
+
 
 # PostgreSQL
-## backup
+## Backup
 Run the following script to backup DB manually
 ```sh
 docker-compose run backup
 ```
 
-## reset
+## Reset
 ```sh
 rm -rf ./volumes/pgadmin \
 ./volumes/postgresql/backup \
@@ -48,9 +48,8 @@ rm -rf ./volumes/pgadmin \
 ./volumes/postgresql/logs
 ```
 
-## initial SQL
-Just run once when there is no data.
-path: volumes/postgresql/pgsql
+## Initial SQL
+Just run once during initialization.(path: volumes/postgresql/pgsql)
 
 
 # Redis
