@@ -29,16 +29,16 @@ redis/volumes/redis/logs
 redis/volumes/redisinsight
 
 # Ignore MySQL data
-*/mysql/volumes/mysql/backup
-*/mysql/volumes/mysql/data
-*/mysql/volumes/mysql/logs
-*/mysql/volumes/phpmyadmin
+*/volumes/mysql/backup
+*/volumes/mysql/data
+*/volumes/mysql/logs
+*/volumes/phpmyadmin
 
 # Ignore PostgreSQL data
-*/postgresql/volumes/postgresql/backup
-*/postgresql/volumes/postgresql/data
-*/postgresql/volumes/postgresql/logs
-*/postgresql/volumes/pgadmin
+*/volumes/postgresql/backup
+*/volumes/postgresql/data
+*/volumes/postgresql/logs
+*/volumes/pgadmin
 
 # Ignore other common files
 *.swp

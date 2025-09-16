@@ -53,3 +53,8 @@ Just run once during initialization.(path: volumes/postgresql/pgsql)
 
 
 # Redis
+## Reset
+```sh
+rm -rf ./volumes/redis/data \
+./volumes/redis/logs 
+```
