@@ -1,0 +1,15 @@
+services:
+  localstack:
+    image: localstack/localstack:latest
+    networks:
+      - test-network
+    ports:
+      - "${EXPORT_PORT_LOCALSTACK:-4566}:4566"
+    volumes:
+      - "./volumes/localstack:/var/lib/localstack"
+      - "./volumes/localstack/run/docker.sock:/var/run/docker.sock"
+    env_file:
+      - .env
+networks:
+  test-network:
+    driver: bridge

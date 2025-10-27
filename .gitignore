@@ -40,6 +40,9 @@ redis/volumes/redisinsight
 */volumes/postgresql/logs
 */volumes/pgadmin
 
+# Ignore Localstack data
+*/volumes/localstack/cache
+
 # Ignore other common files
 *.swp
 *.swo
